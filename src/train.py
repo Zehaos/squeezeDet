@@ -10,6 +10,7 @@ import cv2
 from datetime import datetime
 import os.path
 import sys
+import traceback
 import time
 
 import numpy as np
@@ -160,16 +161,20 @@ def train():
     sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True))
     sess.run(init)
 
+    initial_step = 0
+    global_step = model.global_step
+
     #TODO(shizehao) Restore gobal step
     ckpt = tf.train.get_checkpoint_state(FLAGS.train_dir)
     if ckpt and ckpt.model_checkpoint_path:
         saver.restore(sess, ckpt.model_checkpoint_path)
+        initial_step = global_step.eval()
 
     tf.train.start_queue_runners(sess=sess)
 
     summary_writer = tf.summary.FileWriter(FLAGS.train_dir, sess.graph)
 
-    for step in xrange(FLAGS.max_steps):
+    for step in xrange(initial_step, FLAGS.max_steps):
       start_time = time.time()
 
       # read batch input
@@ -280,8 +285,16 @@ def main(argv=None):  # pylint: disable=unused-argument
   #if tf.gfile.Exists(FLAGS.train_dir):
   #  tf.gfile.DeleteRecursively(FLAGS.train_dir)
   #tf.gfile.MakeDirs(FLAGS.train_dir)
-  train()
-
+  try:
+      train()
+  except:
+      print
+      "Exception in user code:"
+      print
+      '-' * 60
+      traceback.print_exc(file=sys.stdout)
+      print
+      '-' * 60
 
 if __name__ == '__main__':
   tf.app.run()
