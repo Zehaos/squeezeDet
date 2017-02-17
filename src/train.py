@@ -168,7 +168,7 @@ def train():
     ckpt = tf.train.get_checkpoint_state(FLAGS.train_dir)
     if ckpt and ckpt.model_checkpoint_path:
         saver.restore(sess, ckpt.model_checkpoint_path)
-        initial_step = global_step.eval()
+        initial_step = global_step.eval(session=sess)
 
     tf.train.start_queue_runners(sess=sess)
 
