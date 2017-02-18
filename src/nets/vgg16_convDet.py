@@ -16,7 +16,6 @@ import numpy as np
 import tensorflow as tf
 from nn_skeleton import ModelSkeleton
 
-
 class VGG16ConvDet(ModelSkeleton):
   def __init__(self, mc, gpu_id):
     with tf.device('/gpu:{}'.format(gpu_id)):

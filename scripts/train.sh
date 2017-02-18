@@ -5,11 +5,11 @@
 # =========================================================================== #
 python ./src/train.py \
   --dataset=KITTI \
-  --pretrained_model_path=./data/SqueezeNet/squeezenet_v1.1.pkl \
-  --data_path=./data/KITTI \
+  --pretrained_model_path=/home/zehao/PycharmProjects/Res-SqueezeNet/model.pkl \
+  --data_path=/media/zehao/Local2/KITTI \
   --image_set=train \
-  --train_dir=/tmp/bichen/logs/SqueezeDet/train \
-  --net=squeezeDet \
+  --train_dir=/tmp/zehao/logs/ResSqueezeDet/train2 \
+  --net=ressqueezeDet \
   --summary_step=100 \
   --checkpoint_step=500 \
   --gpu=0

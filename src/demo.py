@@ -24,15 +24,12 @@ from config import *
 from train import _draw_box
 from nets import *
 
-# FOR DEBUG ONLY
-# os.chdir('../')
-
 FLAGS = tf.app.flags.FLAGS
 
 tf.app.flags.DEFINE_string(
     'mode', 'image', """'image' or 'video'.""")
 tf.app.flags.DEFINE_string(
-    'checkpoint', './data/model_checkpoints/squeezeDet/model.ckpt-87000',
+    'checkpoint', '/tmp/bichen/logs/SqueezeDet/train2/model.ckpt-42000',
     """Path to the model parameter file.""")
 tf.app.flags.DEFINE_string(
     'input_path', './data/sample.png',

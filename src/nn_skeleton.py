@@ -307,7 +307,6 @@ class ModelSkeleton:
   def _add_train_graph(self):
     """Define the training operation."""
     mc = self.mc
-
     self.global_step = tf.Variable(0, name='global_step', trainable=False)
     lr = tf.train.exponential_decay(mc.LEARNING_RATE,
                                     self.global_step,

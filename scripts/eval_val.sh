@@ -5,11 +5,11 @@
 # =========================================================================== #
 python ./src/eval.py \
   --dataset=KITTI \
-  --data_path=./data/KITTI \
+  --data_path=/media/zehao/Local2/KITTI \
   --image_set=val \
-  --eval_dir=/tmp/bichen/logs/SqueezeDet/eval_val \
-  --checkpoint_path=/tmp/bichen/logs/SqueezeDet/train \
-  --net=squeezeDet \
+  --eval_dir=/tmp/zehao/logs/ResSqueezeDet/eval_val \
+  --checkpoint_path=/tmp/zehao/logs/ResSqueezeDet/train2 \
+  --net=ressqueezeDet \
   --gpu=0
 
 # =========================================================================== #

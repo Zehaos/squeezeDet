@@ -32,7 +32,7 @@ tf.app.flags.DEFINE_string('image_set', 'train',
 tf.app.flags.DEFINE_string('year', '2007',
                             """VOC challenge year. 2007 or 2012"""
                             """Only used for Pascal VOC dataset""")
-tf.app.flags.DEFINE_string('train_dir', '/tmp/bichen/logs/squeezeDet/train',
+tf.app.flags.DEFINE_string('train_dir', '/tmp/zehao/logs/squeezeDet/train',
                             """Directory where to write event logs """
                             """and checkpoint.""")
 tf.app.flags.DEFINE_integer('max_steps', 1000000,
@@ -107,7 +107,8 @@ def train():
   with tf.Graph().as_default():
 
     assert FLAGS.net == 'vgg16' or FLAGS.net == 'resnet50' \
-        or FLAGS.net == 'squeezeDet' or FLAGS.net == 'squeezeDet+', \
+        or FLAGS.net == 'squeezeDet' or FLAGS.net == 'squeezeDet+'\
+        or FLAGS.net == 'ressqueezeDet', \
         'Selected neural net architecture not supported: {}'.format(FLAGS.net)
     if FLAGS.net == 'vgg16':
       mc = kitti_vgg16_config()
@@ -125,6 +126,10 @@ def train():
       mc = kitti_squeezeDetPlus_config()
       mc.PRETRAINED_MODEL_PATH = FLAGS.pretrained_model_path
       model = SqueezeDetPlus(mc, FLAGS.gpu)
+    elif FLAGS.net == 'ressqueezeDet':
+      mc = kitti_ressqueezeDet_config()
+      mc.PRETRAINED_MODEL_PATH = FLAGS.pretrained_model_path
+      model = ResSqueezeDet(mc, FLAGS.gpu)
 
     imdb = kitti(FLAGS.image_set, FLAGS.data_path, mc)
 
@@ -164,7 +169,6 @@ def train():
     initial_step = 0
     global_step = model.global_step
 
-    #TODO(shizehao) Restore gobal step
     ckpt = tf.train.get_checkpoint_state(FLAGS.train_dir)
     if ckpt and ckpt.model_checkpoint_path:
         saver.restore(sess, ckpt.model_checkpoint_path)
@@ -282,9 +286,12 @@ def train():
         saver.save(sess, checkpoint_path, global_step=step)
 
 def main(argv=None):  # pylint: disable=unused-argument
-  #if tf.gfile.Exists(FLAGS.train_dir):
-  #  tf.gfile.DeleteRecursively(FLAGS.train_dir)
-  #tf.gfile.MakeDirs(FLAGS.train_dir)
+  if tf.gfile.Exists(FLAGS.train_dir):
+    #tf.gfile.DeleteRecursively(FLAGS.train_dir)
+    pass
+  else:
+    tf.gfile.MakeDirs(FLAGS.train_dir)
+
   try:
       train()
   except:

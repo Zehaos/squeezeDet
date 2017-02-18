@@ -32,9 +32,9 @@ tf.app.flags.DEFINE_string('image_set', 'test',
 tf.app.flags.DEFINE_string('year', '2007',
                             """VOC challenge year. 2007 or 2012"""
                             """Only used for VOC data""")
-tf.app.flags.DEFINE_string('eval_dir', '/tmp/bichen/logs/squeezeDet/eval',
+tf.app.flags.DEFINE_string('eval_dir', '/tmp/bichen/logs/squeezeDet/eval2',
                             """Directory where to write event logs """)
-tf.app.flags.DEFINE_string('checkpoint_path', '/tmp/bichen/logs/squeezeDet/train',
+tf.app.flags.DEFINE_string('checkpoint_path', '/tmp/bichen/logs/squeezeDet/train2',
                             """Path to the training checkpoint.""")
 tf.app.flags.DEFINE_integer('eval_interval_secs', 60 * 1,
                              """How often to check if new cpt is saved.""")
@@ -110,24 +110,24 @@ def eval_once(saver, ckpt_path, summary_writer, imdb, model):
     eval_summary_ops = []
     for cls, ap in zip(ap_names, aps):
       eval_summary_ops.append(
-          tf.scalar_summary('APs/'+cls, ap)
+          tf.summary.scalar('APs/'+cls, ap)
       )
       print ('    {}: {:.3f}'.format(cls, ap))
     print ('    Mean average precision: {:.3f}'.format(np.mean(aps)))
     eval_summary_ops.append(
-        tf.scalar_summary('APs/mAP', np.mean(aps))
+        tf.summary.scalar('APs/mAP', np.mean(aps))
     )
     eval_summary_ops.append(
-        tf.scalar_summary('timing/image_detect', _t['im_detect'].average_time)
+        tf.summary.scalar('timing/image_detect', _t['im_detect'].average_time)
     )
     eval_summary_ops.append(
-        tf.scalar_summary('timing/image_read', _t['im_read'].average_time)
+        tf.summary.scalar('timing/image_read', _t['im_read'].average_time)
     )
     eval_summary_ops.append(
-        tf.scalar_summary('timing/post_process', _t['misc'].average_time)
+        tf.summary.scalar('timing/post_process', _t['misc'].average_time)
     )
     eval_summary_ops.append(
-        tf.scalar_summary('num_detections_per_image', num_detection/num_images)
+        tf.summary.scalar('num_detections_per_image', num_detection/num_images)
     )
 
     print ('Analyzing detections...')
@@ -135,7 +135,7 @@ def eval_once(saver, ckpt_path, summary_writer, imdb, model):
         FLAGS.eval_dir, global_step)
     for k, v in stats.iteritems():
       eval_summary_ops.append(
-          tf.scalar_summary(
+          tf.summary.scalar(
             'Detection Analysis/'+k, v)
       )
 
@@ -151,7 +151,8 @@ def evaluate():
   with tf.Graph().as_default() as g:
 
     assert FLAGS.net == 'vgg16' or FLAGS.net == 'resnet50' \
-        or FLAGS.net == 'squeezeDet' or FLAGS.net == 'squeezeDet+', \
+        or FLAGS.net == 'squeezeDet' or FLAGS.net == 'squeezeDet+' \
+        or FLAGS.net == 'ressqueezeDet', \
         'Selected neural net architecture not supported: {}'.format(FLAGS.net)
     if FLAGS.net == 'vgg16':
       mc = kitti_vgg16_config()
@@ -173,12 +174,17 @@ def evaluate():
       mc.BATCH_SIZE = 1 # TODO(bichen): allow batch size > 1
       mc.LOAD_PRETRAINED_MODEL = False
       model = SqueezeDetPlus(mc, FLAGS.gpu)
+    elif FLAGS.net == 'ressqueezeDet':
+      mc = kitti_squeezeDetPlus_config()
+      mc.BATCH_SIZE = 1  # TODO(bichen): allow batch size > 1
+      mc.LOAD_PRETRAINED_MODEL = False
+      model = ResSqueezeDet(mc, FLAGS.gpu)
 
     imdb = kitti(FLAGS.image_set, FLAGS.data_path, mc)
 
     saver = tf.train.Saver(model.model_params)
 
-    summary_writer = tf.train.SummaryWriter(FLAGS.eval_dir, g)
+    summary_writer = tf.summary.FileWriter(FLAGS.eval_dir, g)
     
     ckpts = set() 
     while True:
