@@ -19,12 +19,12 @@ python ./src/train.py \
 # =========================================================================== #
 # python ./src/train.py \
 #   --dataset=KITTI \
-#   --pretrained_model_path=./data/SqueezeNet/squeezenet_v1.0_SR_0.750.pkl \
+#   --pretrained_model_path=/home/zehao/PycharmProjects/Res-SqueezeNet/model.pkl \
 #   --data_path=./data/KITTI \
 #   --image_set=train \
-#   --train_dir=/tmp/bichen/logs/SqueezeDetPlus/train \
+#   --train_dir=/tmp/zehao/logs/ResSqueezeDet/train2 \
 #   --net=squeezeDet+ \
-#   --summary_step=100 \
+#   --summary_step=300 \
 #   --checkpoint_step=500 \
 #   --gpu=0
 
