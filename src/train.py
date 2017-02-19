@@ -17,7 +17,7 @@ import numpy as np
 from six.moves import xrange
 import tensorflow as tf
 
-from config import *
+from configs import *
 from dataset import pascal_voc, kitti
 from utils.util import sparse_to_dense, bgr_to_rgb, bbox_transform
 from nets import *
