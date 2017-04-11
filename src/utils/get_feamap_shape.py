@@ -23,8 +23,6 @@ from nets import *
 FLAGS = tf.app.flags.FLAGS
 
 tf.app.flags.DEFINE_string(
-    'mode', 'image', """'image' or 'video'.""")
-tf.app.flags.DEFINE_string(
     'checkpoint', '/home/zehao/PycharmProjects/squeezeDet/data/model_checkpoints/squeezeDet/model.ckpt-87000',
     """Path to the model parameter file.""")
 
@@ -34,7 +32,7 @@ def get_feamap_shape():
 
     with tf.Graph().as_default():
         # Load model
-        mc = voc_squeezeDet_config()
+        mc = kitti_squeezeDet_config()
         mc.BATCH_SIZE = 1
         # model parameters will be restored from checkpoint
         mc.LOAD_PRETRAINED_MODEL = False
