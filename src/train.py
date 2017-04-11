@@ -32,7 +32,7 @@ tf.app.flags.DEFINE_string('image_set', 'train',
 tf.app.flags.DEFINE_string('year', '2007',
                             """VOC challenge year. 2007 or 2012"""
                             """Only used for Pascal VOC dataset""")
-tf.app.flags.DEFINE_string('train_dir', '/tmp/bichen/logs/squeezeDet/train',
+tf.app.flags.DEFINE_string('train_dir', '/tmp/zehao/logs/squeezeDet/train',
                             """Directory where to write event logs """
                             """and checkpoint.""")
 tf.app.flags.DEFINE_integer('max_steps', 1000000,
@@ -101,32 +101,39 @@ def _viz_prediction_result(model, images, bboxes, labels, batch_det_bbox,
 
 def train():
   """Train SqueezeDet model"""
-  assert FLAGS.dataset == 'KITTI', \
-      'Currently only support KITTI dataset'
+  assert FLAGS.dataset in ['KITTI', 'PASCAL_VOC'], \
+      'Currently only support KITTI & PASCAL_VOC dataset'
 
   with tf.Graph().as_default():
 
-    assert FLAGS.net == 'vgg16' or FLAGS.net == 'resnet50' \
-        or FLAGS.net == 'squeezeDet' or FLAGS.net == 'squeezeDet+', \
+    assert FLAGS.net in ['vgg16', 'resnet50', 'squeezeDet', 'squeezeDet+', 'voc_squeezeDet'], \
         'Selected neural net architecture not supported: {}'.format(FLAGS.net)
     if FLAGS.net == 'vgg16':
       mc = kitti_vgg16_config()
       mc.PRETRAINED_MODEL_PATH = FLAGS.pretrained_model_path
       model = VGG16ConvDet(mc, FLAGS.gpu)
+      imdb = kitti(FLAGS.image_set, FLAGS.data_path, mc)
     elif FLAGS.net == 'resnet50':
       mc = kitti_res50_config()
       mc.PRETRAINED_MODEL_PATH = FLAGS.pretrained_model_path
       model = ResNet50ConvDet(mc, FLAGS.gpu)
+      imdb = kitti(FLAGS.image_set, FLAGS.data_path, mc)
     elif FLAGS.net == 'squeezeDet':
       mc = kitti_squeezeDet_config()
       mc.PRETRAINED_MODEL_PATH = FLAGS.pretrained_model_path
       model = SqueezeDet(mc, FLAGS.gpu)
+      imdb = kitti(FLAGS.image_set, FLAGS.data_path, mc)
     elif FLAGS.net == 'squeezeDet+':
       mc = kitti_squeezeDetPlus_config()
       mc.PRETRAINED_MODEL_PATH = FLAGS.pretrained_model_path
       model = SqueezeDetPlus(mc, FLAGS.gpu)
+      imdb = kitti(FLAGS.image_set, FLAGS.data_path, mc)
+    elif FLAGS.net == 'voc_squeezeDet':
+      mc = voc_squeezeDet_config()
+      mc.PRETRAINED_MODEL_PATH = FLAGS.pretrained_model_path
+      model = VocSqueezeDet(mc, FLAGS.gpu)
+      imdb = pascal_voc(FLAGS.image_set, FLAGS.year, FLAGS.data_path, mc)
 
-    imdb = kitti(FLAGS.image_set, FLAGS.data_path, mc)
 
     # save model size, flops, activations by layers
     with open(os.path.join(FLAGS.train_dir, 'model_metrics.txt'), 'w') as f:
@@ -164,7 +171,7 @@ def train():
     initial_step = 0
     global_step = model.global_step
 
-    #TODO(shizehao) Restore gobal step
+    # Restore gobal step
     ckpt = tf.train.get_checkpoint_state(FLAGS.train_dir)
     if ckpt and ckpt.model_checkpoint_path:
         saver.restore(sess, ckpt.model_checkpoint_path)
@@ -282,9 +289,11 @@ def train():
         saver.save(sess, checkpoint_path, global_step=step)
 
 def main(argv=None):  # pylint: disable=unused-argument
-  #if tf.gfile.Exists(FLAGS.train_dir):
+  if tf.gfile.Exists(FLAGS.train_dir):
+      pass
   #  tf.gfile.DeleteRecursively(FLAGS.train_dir)
-  #tf.gfile.MakeDirs(FLAGS.train_dir)
+  else:
+      tf.gfile.MakeDirs(FLAGS.train_dir)
   try:
       train()
   except:

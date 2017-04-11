@@ -1,5 +1,5 @@
 """Get output feature map shape
-for config
+Make sure add forward graph only
 """
 
 from __future__ import absolute_import
@@ -19,8 +19,6 @@ from config import *
 from train import _draw_box
 from nets import *
 
-# FOR DEBUG ONLY
-# os.chdir('../')
 
 FLAGS = tf.app.flags.FLAGS
 
