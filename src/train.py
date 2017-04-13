@@ -106,7 +106,7 @@ def train():
 
   with tf.Graph().as_default():
 
-    assert FLAGS.net in ['vgg16', 'resnet50', 'squeezeDet', 'squeezeDet+', 'voc_squeezeDet'], \
+    assert FLAGS.net in ['vgg16', 'resnet50', 'squeezeDet', 'squeezeDet+', 'voc_squeezeDet', 'voc_squeezeDet_5D'], \
         'Selected neural net architecture not supported: {}'.format(FLAGS.net)
     if FLAGS.net == 'vgg16':
       mc = kitti_vgg16_config()
@@ -132,6 +132,11 @@ def train():
       mc = voc_squeezeDet_config()
       mc.PRETRAINED_MODEL_PATH = FLAGS.pretrained_model_path
       model = VocSqueezeDet(mc, FLAGS.gpu)
+      imdb = pascal_voc(FLAGS.image_set, FLAGS.year, FLAGS.data_path, mc)
+    elif FLAGS.net == 'voc_squeezeDet_5D':
+      mc = voc_squeezeDet_5D_config()
+      mc.PRETRAINED_MODEL_PATH = FLAGS.pretrained_model_path
+      model = VocSqueezeDet5D(mc, FLAGS.gpu)
       imdb = pascal_voc(FLAGS.image_set, FLAGS.year, FLAGS.data_path, mc)
 
 

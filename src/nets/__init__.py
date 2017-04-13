@@ -3,3 +3,4 @@ from squeezeDetPlus import SqueezeDetPlus
 from resnet50_convDet import ResNet50ConvDet
 from vgg16_convDet import VGG16ConvDet
 from voc_squeezeDet import VocSqueezeDet
+from voc_squeezeDet_5D import VocSqueezeDet5D
