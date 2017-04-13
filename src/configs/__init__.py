@@ -9,4 +9,4 @@ from configs.kitti_res50_config import kitti_res50_config
 from configs.kitti_squeezeDet_config import kitti_squeezeDet_config
 from configs.kitti_squeezeDetPlus_config import kitti_squeezeDetPlus_config
 from configs.voc_squeezeDet_config import voc_squeezeDet_config
-from configs.voc_squeezeDet_config import voc_squeezeDet_5D_config
+from configs.voc_squeezeDet_5D_config import  import voc_squeezeDet_5D_config
