@@ -106,7 +106,9 @@ def train():
 
   with tf.Graph().as_default():
 
-    assert FLAGS.net in ['vgg16', 'resnet50', 'squeezeDet', 'squeezeDet+', 'voc_squeezeDet', 'voc_squeezeDet_5D'], \
+    assert FLAGS.net in ['vgg16', 'resnet50', 'squeezeDet',
+                         'squeezeDet+', 'voc_squeezeDet',
+                         'voc_squeezeDet_5D', 'voc_ressqueezeDet_5D'], \
         'Selected neural net architecture not supported: {}'.format(FLAGS.net)
     if FLAGS.net == 'vgg16':
       mc = kitti_vgg16_config()
