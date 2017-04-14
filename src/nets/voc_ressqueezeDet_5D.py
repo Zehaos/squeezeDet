@@ -131,4 +131,4 @@ class VocResSqueezeDet5D(ModelSkeleton):
           padding='SAME', freeze=freeze)
       concat_op = tf.concat([ex1x1, ex3x3], 3, name=layer_name + '/concat')
 
-      return tf.concat([inputs + concat_op], 3, name=layer_name + '/res_concat')
+      return tf.concat([inputs, concat_op], 3, name=layer_name + '/res_concat')
