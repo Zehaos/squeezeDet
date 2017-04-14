@@ -29,8 +29,8 @@ tf.app.flags.DEFINE_string('dataset', 'KITTI',
 tf.app.flags.DEFINE_string('data_path', '', """Root directory of data""")
 tf.app.flags.DEFINE_string('image_set', 'train',
                            """ Can be train, trainval, val, or test""")
-tf.app.flags.DEFINE_string('year', '2007',
-                            """VOC challenge year. 2007 or 2012"""
+tf.app.flags.DEFINE_string('year', '0712',
+                            """VOC challenge year. 2007 or 2012 or 0712"""
                             """Only used for Pascal VOC dataset""")
 tf.app.flags.DEFINE_string('train_dir', '/tmp/zehao/logs/squeezeDet/train',
                             """Directory where to write event logs """
@@ -137,6 +137,11 @@ def train():
       mc = voc_squeezeDet_5D_config()
       mc.PRETRAINED_MODEL_PATH = FLAGS.pretrained_model_path
       model = VocSqueezeDet5D(mc, FLAGS.gpu)
+      imdb = pascal_voc(FLAGS.image_set, FLAGS.year, FLAGS.data_path, mc)
+    elif FLAGS.net == 'voc_ressqueezeDet_5D':
+      mc = voc_squeezeDet_5D_config()
+      mc.PRETRAINED_MODEL_PATH = FLAGS.pretrained_model_path
+      model = VocResSqueezeDet5D(mc, FLAGS.gpu)
       imdb = pascal_voc(FLAGS.image_set, FLAGS.year, FLAGS.data_path, mc)
 
 
