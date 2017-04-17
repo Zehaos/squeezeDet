@@ -309,8 +309,7 @@ def train():
 
 def main(argv=None):  # pylint: disable=unused-argument
   if tf.gfile.Exists(FLAGS.train_dir):
-      pass
-  #  tf.gfile.DeleteRecursively(FLAGS.train_dir)
+      tf.gfile.DeleteRecursively(FLAGS.train_dir)
   else:
       tf.gfile.MakeDirs(FLAGS.train_dir)
   try:
