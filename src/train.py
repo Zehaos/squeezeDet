@@ -108,7 +108,8 @@ def train():
 
     assert FLAGS.net in ['vgg16', 'resnet50', 'squeezeDet',
                          'squeezeDet+', 'voc_squeezeDet',
-                         'voc_squeezeDet_5D', 'voc_ressqueezeDet_5D'], \
+                         'voc_squeezeDet_5D', 'voc_ressqueezeDet_5D',
+                         'voc_squeezeDet_5D_allmaxpool'], \
         'Selected neural net architecture not supported: {}'.format(FLAGS.net)
     if FLAGS.net == 'vgg16':
       mc = kitti_vgg16_config()
@@ -145,6 +146,12 @@ def train():
       mc.PRETRAINED_MODEL_PATH = FLAGS.pretrained_model_path
       model = VocResSqueezeDet5D(mc, FLAGS.gpu)
       imdb = pascal_voc(FLAGS.image_set, FLAGS.year, FLAGS.data_path, mc)
+    elif FLAGS.net == 'voc_squeezeDet_5D_allmaxpool':
+      mc = voc_squeezeDet_5D_config()
+      mc.PRETRAINED_MODEL_PATH = FLAGS.pretrained_model_path
+      model = VocSqueezeDet5DAMP(mc, FLAGS.gpu)
+      imdb = pascal_voc(FLAGS.image_set, FLAGS.year, FLAGS.data_path, mc)
+
 
 
     # save model size, flops, activations by layers

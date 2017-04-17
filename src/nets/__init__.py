@@ -5,3 +5,4 @@ from vgg16_convDet import VGG16ConvDet
 from voc_squeezeDet import VocSqueezeDet
 from voc_squeezeDet_5D import VocSqueezeDet5D
 from voc_ressqueezeDet_5D import VocResSqueezeDet5D
+from voc_squeezeDet_5D_allmaxpool import VocSqueezeDet5DAMP

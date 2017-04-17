@@ -15,8 +15,7 @@ import glob
 import numpy as np
 import tensorflow as tf
 
-from config import *
-from train import _draw_box
+from configs import *
 from nets import *
 
 
@@ -32,18 +31,18 @@ def get_feamap_shape():
 
     with tf.Graph().as_default():
         # Load model
-        mc = kitti_squeezeDet_config()
+        mc = voc_squeezeDet_5D_allmaxpool_config()
         mc.BATCH_SIZE = 1
         # model parameters will be restored from checkpoint
         mc.LOAD_PRETRAINED_MODEL = False
-        model = SqueezeDet(mc, FLAGS.gpu)
+        model = VocSqueezeDet5DAMP(mc, 0)
 
-        saver = tf.train.Saver(model.model_params)
+        #saver = tf.train.Saver(model.model_params)
 
         with tf.Session(config=tf.ConfigProto(allow_soft_placement=True)) as sess:
-            saver.restore(sess, FLAGS.checkpoint)
+            init = tf.global_variables_initializer()
+            sess.run(init)
 
-            # im = cv2.imread(f)
             im = np.zeros([100, 100, 3])
             im = im.astype(np.float32, copy=False)
             im = cv2.resize(im, (mc.IMAGE_WIDTH, mc.IMAGE_HEIGHT))
