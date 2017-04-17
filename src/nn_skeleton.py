@@ -351,7 +351,7 @@ class ModelSkeleton:
 
   def _conv_bn_layer(
       self, inputs, conv_param_name, bn_param_name, scale_param_name, filters,
-      size, stride, padding='SAME', freeze=False, relu=True,
+      size, stride, padding='SAME', freeze=False, activation_function='relu',
       conv_with_bias=False, stddev=0.001):
     """ Convolution + BatchNorm + [relu] layer. Batch mean and var are treated
     as constant. Weights have to be initialized from a pre-trained model or
@@ -432,7 +432,7 @@ class ModelSkeleton:
       out_shape = conv.get_shape().as_list()
       num_flops = \
         (1+2*int(channels)*size*size)*filters*out_shape[1]*out_shape[2]
-      if relu:
+      if activation_function == 'relu':
         num_flops += 2*filters*out_shape[1]*out_shape[2]
       self.flop_counter.append((conv_param_name, num_flops))
 
@@ -440,15 +440,28 @@ class ModelSkeleton:
           (conv_param_name, out_shape[1]*out_shape[2]*out_shape[3])
       )
 
-      if relu:
-        return tf.nn.relu(conv)
-      else:
-        return conv
+      if activation_function == 'relu':
+        out = tf.nn.relu(conv, 'relu')
+      elif activation_function == 'relu6':
+        out = tf.nn.relu6(conv, 'relu6')
+      elif activation_function == 'elu':
+        out = tf.nn.elu(conv, 'elu')
+      elif activation_function == 'elu':
+        out = tf.nn.sigmoid(conv, 'sigmoid')
+      elif activation_function == 'softplus':
+        out = tf.nn.softplus(conv, 'softplus')
+      elif activation_function == 'softsign':
+        out = tf.nn.softsign(conv, 'softsign')
+      elif activation_function == 'tanh':
+        out = tf.nn.tanh(conv, 'tanh')
+      elif activation_function is None:
+        out = conv
+      return out
 
 
   def _conv_layer(
       self, layer_name, inputs, filters, size, stride, padding='SAME',
-      freeze=False, xavier=False, relu=True, stddev=0.001):
+      freeze=False, xavier=False, activation_function='relu', stddev=0.001):
     """Convolutional layer operation constructor.
 
     Args:
@@ -519,9 +532,21 @@ class ModelSkeleton:
           name='convolution')
       conv_bias = tf.nn.bias_add(conv, biases, name='bias_add')
   
-      if relu:
+      if activation_function == 'relu':
         out = tf.nn.relu(conv_bias, 'relu')
-      else:
+      elif activation_function == 'relu6':
+        out = tf.nn.relu6(conv_bias, 'relu6')
+      elif activation_function == 'elu':
+        out = tf.nn.elu(conv_bias, 'elu')
+      elif activation_function == 'elu':
+        out = tf.nn.sigmoid(conv_bias, 'sigmoid')
+      elif activation_function == 'softplus':
+        out = tf.nn.softplus(conv_bias, 'softplus')
+      elif activation_function == 'softsign':
+        out = tf.nn.softsign(conv_bias, 'softsign')
+      elif activation_function == 'tanh':
+        out = tf.nn.tanh(conv_bias, 'tanh')
+      elif activation_function is None:
         out = conv_bias
 
       self.model_size_counter.append(
@@ -530,7 +555,7 @@ class ModelSkeleton:
       out_shape = out.get_shape().as_list()
       num_flops = \
         (1+2*int(channels)*size*size)*filters*out_shape[1]*out_shape[2]
-      if relu:
+      if activation_function == 'relu':
         num_flops += 2*filters*out_shape[1]*out_shape[2]
       self.flop_counter.append((layer_name, num_flops))
 
@@ -565,7 +590,7 @@ class ModelSkeleton:
 
   
   def _fc_layer(
-      self, layer_name, inputs, hiddens, flatten=False, relu=True,
+      self, layer_name, inputs, hiddens, flatten=False, activation_function='relu',
       xavier=False, stddev=0.001):
     """Fully connected layer operation constructor.
 
@@ -656,20 +681,35 @@ class ModelSkeleton:
       self.model_params += [weights, biases]
   
       outputs = tf.nn.bias_add(tf.matmul(inputs, weights), biases)
-      if relu:
-        outputs = tf.nn.relu(outputs, 'relu')
+
+      if activation_function == 'relu':
+        out = tf.nn.relu(outputs, 'relu')
+      elif activation_function == 'relu6':
+        out = tf.nn.relu6(outputs, 'relu6')
+      elif activation_function == 'elu':
+        out = tf.nn.elu(outputs, 'elu')
+      elif activation_function == 'elu':
+        out = tf.nn.sigmoid(outputs, 'sigmoid')
+      elif activation_function == 'softplus':
+        out = tf.nn.softplus(outputs, 'softplus')
+      elif activation_function == 'softsign':
+        out = tf.nn.softsign(outputs, 'softsign')
+      elif activation_function == 'tanh':
+        out = tf.nn.tanh(outputs, 'tanh')
+      elif activation_function is None:
+        out = outputs
 
       # count layer stats
       self.model_size_counter.append((layer_name, (dim+1)*hiddens))
 
-      num_flops = 2 * dim * hidden + hidden
-      if relu:
+      num_flops = 2 * dim * hiddens + hiddens
+      if activation_function == 'relu':
         num_flops += 2*hiddens
       self.flop_counter.append((layer_name, num_flops))
 
       self.activation_counter.append((layer_name, hiddens))
 
-      return outputs
+      return out
 
   def filter_prediction(self, boxes, probs, cls_idx):
     """Filter bounding box predictions with probability threshold and
